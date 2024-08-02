@@ -1,127 +1,75 @@
-# Kura Labs Cohort 5- Deployment Workload 1
-## Intro to CI/CD
+# RETAIL BANKING APPLICATION
 
-Welcome to Deployment Workload 1!  By now you’ve learned about system designs and the CI/CD Pipeline.  Let’s start putting it all together and see it in action.  
+# PURPOSE
 
-Be sure to document each step in the process and explain WHY each step is important to the pipeline.
+This workload presents a practical implementation of a CI/CD pipeline and the application of system design principles. The deployment of the Retail Banking App showcases the end-to-end deployment process for a web application.
 
-## Instructions
+# STEPS
 
-1. Clone this repository to your GitHub account
-2. Create an EC2
+## Step 1 - Clone this repository to your GitHub account
 
-	a. Follow document: [AWS EC2 Quickstart Guide](https://github.com/kura-labs-org/AWS-EC2-Quick-Start-Guide/blob/main/AWS%20EC2%20Quick%20Start%20Guide.pdf) if needed
-3. Install Jenkins onto the EC2
+GitHub is the source code management tool of choice. Committing the Retail Bank application code to our SCM ensures that as collaboration happens, all changes are tracked, and versions managed appropriately. This step also facilitates integration with automation tools in our CI/CD pipeline, e.g., Jenkins.
 
-	a. Connect to the EC2 terminal
+## Step 2 - Create an EC2
 
- 	b. Enter the following commands to install Jenkins:
+The AWS EC2 instance provides the infrastructure needed to run the servers required for the application. The advantage of using cloud infrastructure, such as AWS’s EC2, is that it is scalable and enables resources to be allocated based on application requirements.
 
-```
-    $sudo apt update && sudo apt install fontconfig openjdk-17-jre software-properties-common && sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt install python3.7 python3.7-venv
-    $sudo wget -O /usr/share/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
-    $echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
-    $sudo apt-get update
-    $sudo apt-get install jenkins
-    $sudo systemctl start jenkins
-    $sudo systemctl status jenkins
+## Step 3 - Install Jenkins onto the EC2
 
-```
+Jenkins is a DevOps tool that automates the continuous building, testing, and deployment of applications in the CI/CD pipeline. Installing Jenkins ensures that any changes to code are continuously integrated, tested, and deployed. By automating both essential and redundant tasks, Jenkins helps to minimize human errors, improve code quality, and enable faster development and deployment of the application.
 
-If successful, the last command should show the Jenkins service “active (running)”
+## Step 4 & 5 - Log into Jenkins and Create a Multi-Branch Pipeline
 
-4. Log into Jenkins
+Creating an account in Jenkins is required in this step to configure the server, set up pipelines, and manage jobs required by the application. Among the four main types of pipelines, a multi-branch pipeline is the most appropriate for this multi-branched deployment project. This type automatically detects, coordinates, and manages each branch of the code according to their required specifications. This consistent and continuous management helps ensure consistent development, testing, and deployment of the application.
 
-	a. Enter initial admin password
+## Step 6 - Connect the GitHub Repository to Jenkins
 
-	b. Install suggested plugins
+To automate the build and deployment process, Jenkins needs access to the source code available on the project repository. Connecting the GitHub repository to Jenkins integrates the source code management system within the CI/CD pipeline. This connection gives Jenkins access to the project source code so that builds and tests are automatically triggered whenever changes are pushed to the repository. This again minimizes human errors and ensures that code is always in a deployable state.
 
-	c. Create first admin user
+## Step 7 – Creating Web Environment and Deploying the Retail Banking Application with AWS
 
-5. Create a Multi-Branch pipeline
+AWS Elastic Beanstalk is a Platform as a Service (PaaS) offered by Amazon Web Services (AWS) that manages the deployment, management, and scaling of web applications and services. As a fully managed service, it facilitates the quick deployment of applications in the cloud without the need to manage the underlying infrastructure.
 
-	a. Click on “New Item” in the menu on the left of the page
+# ISSUES/TROUBLESHOOTING
 
-	b. Enter a name for your pipeline
-  
-    c. Select “Multibranch Pipeline”
-  
-    d. Under “Branch Sources”, click “Add source” and select “GitHub”
-  
-    e. Click “+ Add” and select “Jenkins”
-  
-    f. Make sure “Kind” reads “Username and password”
+### ISSUE #1
+I got a 502 Bad Gateway error pointing to the fact that it was a server-side error.
 
-    g. Under “Username”, enter your GitHub username
+### ISSUE #2
+For some reason, I could not get the logs from the console
 
-    h. Under “Password” ,enter your GitHub personal access token
+#### TROUBLESHOOTING STEPS
+- Checked the server logs and found out from /var/log/nginx/error.log that although it was trying to listen on port 8000 nothing was running on that port.
 
-To get the GitHub personal access token, first log into GitHub and click on your profile icon on the top right of the page.
+Out of the many overkill steps I took, these are the steps that I believe were successful:
+1. Installing/re-installing gunicorn (`pip install gunicorn`)
+2. Starting the application with python.
+3. Mapping the port 8000/starting the application with gunicorn (`gunicorn -w 4 -b 127.0.0.1:8000 application:application`)
 
-i. On the dropdown menu, click on “Settings”
+# OPTIMIZATION
 
-ii. Click on “<> Developer settings at the bottom of the menu on the left of the page
+### #1 What are the benefits of using managed services for cloud infrastructure?
 
-iii. Click on “Personal access tokens” on the menu on the left of the page and select “Tokens (classic)”
+**Costs:** Among the many benefits of using managed services for cloud infrastructure, cost-effectiveness stands out. Managed services allow applications to scale up or scale down as needed, allowing businesses to only pay for the resources they use. This ensures that businesses do not overpay for unused resources, saving costs.
 
-iv. Click “Generate new token” and select the classic option
+**Flexibility:** Another benefit is the flexibility managed services provide for scaling infrastructure to meet the application’s present performance needs. This is beneficial for businesses that require resources for small to large-scale applications or during periods of consistent or fluctuating demand.
 
-v. Set an expiration date and then select the following "scopes": repo, admin:repo_hook
+**Faster time to market:** In the case of this Retail Banking app, AWS’s managed services take care of provisioning resources like the virtual machines needed to host the application, deployment, load balancing, scaling, and monitoring the application’s performance. Managing these important aspects takes out the need for manual configuration, allowing developers to save time and focus on moving the application from code creation to market-ready more quickly. This frees up valuable time and effort, enabling faster deployment and reducing the time it takes to get applications up and running.
 
-This token can only be viewed ONCE! Make sure you enter the token properly (or save it) before leaving the page otherwise a new token must be generated!
+### #2 What are some issues that a retail bank would face choosing this deployment method and how would you address/resolve them?
 
-6. Connect GitHub repository to Jenkins
+**Customization:** A bank might be required by business needs or industry regulations to implement specific configurations that one managed service provider might not offer.
+- **Possible Solution:** Utilize multiple cloud providers or combine managed services with self-managed infrastructure where applicable.
 
-	a. Enter the repository HTTPS URL and click "Validate"
-  
-	b. Make sure that the "Build Configuration" section says "Mode: by Jenkinsfile" and "Script Path: Jenkinsfile"
-  
-	c. Click "Save" and a build should start automatically
+**Data Security and Privacy:** Banks have access to sensitive customer information and are responsible for protecting it. Although managed services providers are responsible for the underlying infrastructure, businesses like banks are responsible for protecting sensitive customer data. A breach can have severe consequences. Managed services could introduce vulnerabilities if not properly secured and managed.
+- **Possible Solutions:**
+  - **Access Control:** Maintaining proper access control and practicing the principles of least privilege. Ensuring that employees and systems only have the minimum access necessary to perform their tasks.
+  - **Data Encryption:** Another solution would be to encrypt data at rest or in motion.
+  - **Disaster Recovery Plan:** Lastly, it’s not a matter of if there would be a breach but when there would be a breach. Businesses like banks should have a good disaster recovery plan in place to respond to security incidents.
 
-Did the build stages successfully complete? If not, why? How did you resolve the issue?  What did each stage do?
+### #3 - What are other disadvantages of using Elastic Beanstalk or similar managed services for deploying applications?
 
-7. After successfully completing the build (provide screenshot of successful build in documentation), download the contents of the repository (the one in your personal GitHub NOT the kuralabs repo!) and upload a zip file of the application it to AWS Elastic Beanstalk.
-  
-	a. First, follow the instructions in this [LINK](https://scribehow.com/shared/How_to_Create_an_AWS_IAM_Role_for_Elastic_Beanstalk_and_EC2__kTg4B7zRRxCp-aYTJc-WLg) for "How to Create an AWS IAM Role for Elastic Beanstalk and EC2" and create the two IAM roles as specified.
+**Application Need:** Although using managed services has many advantages, not all applications are built equally, and not all can benefit from a one-size-fits-all approach. Applications with unique requirements might not find a perfect fit with one managed resource provider and might need to adopt a hybrid cloud strategy. This can increase complexity and might increase costs.
 
-    b. Navigate to the AWS Elastic Beanstalk console page
+**Limited Control:** Some businesses that utilize managed services infrastructure might have to compromise on certain functionalities and find their limited ability to customize certain configurations a disadvantage.
 
-    c. Navigate to the "Environments" page on the left side menu and click on "Create Environment"
-
-    d. Create a "Web server environment" and enter the an Application name (Environment name should auto populate after that)
-
-    e. Choose "Python 3.7" as the "Managed platform"
-
-    f. "Upload your code" by choosing a "local file" and select the zipped application files you created earlier.
-
-    g. Under "Presets", make sure that "Single instance (free tier eligible) is selected and then click "Next"
-
-    h. Select the "Service role" and "EC2 profile" in the appropriate drop down menus and then click "Next"
-
-    i. Select the default VPC and Subnet "us-east-1a" and then click "Next"
-
-    j. Select "General Purpose (SSD) for "Root volume type" and assign it 10 GB.
-
-    k. Ensure that "Single instance" is selected for the "Environment type" and that ONLY "t3.micro" is selected for instance types (remove all others if present) and then click "Next"
-
-    l. Select 'BASIC' health reporting under the monitoring section. NOT "ENHANCED"!
-
-    m. Continue to the "Review" page and then click "Submit".
-
-    n. When the "environment is successfully launched", click on the link provided in the "Domain" and confirm that the application has deployed!
-
-8. Document! All projects have documentation so that others can read and understand what was done and how it was done. Create a README.md file in your repository that describes:
-
-	a. The "PURPOSE" of the Workload, 
-	
-	b. The "STEPS" taken (and why each was necessary/important, 
-	
-	c. A "SYSTEM DESIGN DIAGRAM" that is created in draw.io, 
-	
-	d. "ISSUES/TROUBLESHOOTING" that may or may have occured, 
-	
-	e. An "OPTIMIZATION" section for that answers the question: What are the benefits of using managed services for cloud infrastructure?  What are some issues that a retail bank would face choosing this method of deployment and how would you address/resolve them? What are other disadvantages of using elastic beanstalk or similar managed services for deploying applications?
-	
-	f. A "CONCLUSION" statement as well as any other sections you feel like you want to include.
-
-The README.md is a markdown file that has unique formatting.  Be sure to look up how to write in markdown or use a txt to markdown converter. 
